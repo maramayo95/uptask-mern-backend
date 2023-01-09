@@ -3,6 +3,7 @@ import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
 
 const usuarios = async (req, res) => {
+  console.log(req.body)
   const { email } = req.body;
 
   const existeUsuario = await Usuario.findOne({ email: email });
@@ -13,6 +14,7 @@ const usuarios = async (req, res) => {
   }
 
   const usuarioRequest = req.body;
+
   try {
     const usuario = await new Usuario(usuarioRequest);
     usuario.token = generarId();
