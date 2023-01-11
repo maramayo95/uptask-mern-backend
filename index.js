@@ -5,6 +5,7 @@ import mongoose from 'mongoose'
 import usuariosRoutes from './routes/usuariosRoutes.js'
 import  proyectoRouter  from './routes/proyectoRoutes.js'
 import tareaRoute from './routes/tareasRoutes.js'
+import {MongoClient, ServerApiVersion} from 'mongodb'
 import cors from 'cors'
 
 const app = express()
@@ -15,8 +16,17 @@ app.use("/api/usuarios", usuariosRoutes )
 app.use("/api/proyectos", proyectoRouter)
 app.use("/api/tareas", tareaRoute)
 
+
 mongoose.set('strictQuery', true);
 mongoose.connect(process.env.DB)
+
+// const uri = process.env.DB;
+// const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
+// client.connect(err => {
+//   const collection = client.db("test").collection("devices");
+//   // perform actions on the collection object
+//   client.close();
+// });
 
 //  CORS
 //const whiteList = ['http://localhost:5173'];
@@ -36,5 +46,5 @@ app.use(cors({
     origin: ['http://localhost:5173']
 }))
 
-app.listen(process.env.PORT, ()=> `Listen on port http://localhost:${process.env.PORT}`)
+app.listen(process.env.PORT, ()=> console.log(`Listen on port http://localhost:${process.env.PORT}`))
 
