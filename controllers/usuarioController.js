@@ -1,9 +1,9 @@
 import Usuario from "../models/Usuarios.js";
 import generarId from "../helpers/generarId.js";
 import generarJWT from "../helpers/generarJWT.js";
+import {emailOlvidePassword, emailRegister} from '../helpers/emails.js'
 
 const usuarios = async (req, res) => {
-  console.log(req.body)
   const { email } = req.body;
 
   const existeUsuario = await Usuario.findOne({ email: email });
@@ -18,8 +18,17 @@ const usuarios = async (req, res) => {
   try {
     const usuario = await new Usuario(usuarioRequest);
     usuario.token = generarId();
-    const usuarioAlmacenado = await usuario.save();
-    res.send("Usuario almacenado correctamente");
+    await usuario.save();
+
+    // Send email 
+    emailRegister({
+      email : usuario.email,
+      nombre: usuario.nombre,
+      token: usuario.token
+    })
+    res.json({
+      msg: "Usuario almacenado correctamente, Revisa tu email para confirmar tu cuenta. ",
+    });
   } catch (error) {
     console.log(error);
   }
@@ -53,8 +62,8 @@ const autenticar = async (req, res) => {
 
 const confirmar = async (req, res) => {
   const { token } = req.params;
-  const usuarioConfirmar = await Usuario.findOne({ token });
-  
+  const usuarioConfirmar = await Usuario.findOne({ token : token  });
+
   if (!usuarioConfirmar) {
     const error = new Error("No se ha podido realizar la solicitud");
     return res.status(403).json({ msg: error.message });
@@ -76,14 +85,21 @@ const olvidePassword = async (req, res) => {
 
   if (!usuario) {
     const error = new Error("El usuario no existe");
-    return res.status(400).json({ msg: error.message });
+    return res.status(404).json({ msg: error.message });
   }
 
   try {
     usuario.token = generarId();
     await usuario.save();
+    emailOlvidePassword({
+      email,
+      nombre,
+      token
+    })
     res.json({ msg: "Hemos enviado un email con las instrucciones" });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error)
+  }
 };
 
 const comprobarToken = async (req, res) => {
@@ -117,10 +133,10 @@ const nuevoPassword = async (req, res) => {
   }
 };
 
-const perfil = async (req,res) => {
-  const {usuario} = req
-  res.json(usuario)
-}
+const perfil = async (req, res) => {
+  const { usuario } = req;
+  res.json(usuario);
+};
 
 export {
   usuarios,
@@ -129,5 +145,5 @@ export {
   comprobarToken,
   olvidePassword,
   nuevoPassword,
-  perfil
+  perfil,
 };
