@@ -54,7 +54,7 @@ export const emailOlvidePassword = async (data) => {
         
         </p> 
 
-        <p> Si tu no creaste esta cuenta, puedes ignorar el mensaje</p>
+        <p> Si no realizaste esta operación, podes ignorar el mensaje</p>
         `
     })
 }
